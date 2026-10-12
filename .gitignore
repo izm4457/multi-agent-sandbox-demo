@@ -1,0 +1,8 @@
+# node_modules は worktree 内ではシンボリックリンクになるため末尾スラッシュなしで指定
+node_modules
+.worktrees/
+.agent-runs/
+dist/
+.env
+.env.*
+.DS_Store

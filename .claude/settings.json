@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(scripts/status.sh)",
+      "Bash(scripts/new-worktree.sh *)",
+      "Bash(scripts/commit-task.sh *)",
+      "Bash(scripts/opencode-worker.sh *)",
+      "Bash(scripts/codex-review.sh *)",
+      "Bash(scripts/codex-fix.sh *)",
+      "Bash(scripts/verify.sh *)",
+      "Bash(npm run verify)",
+      "Bash(npm run test)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git worktree list)"
+    ],
+    "ask": [
+      "Bash(scripts/merge-task.sh *)"
+    ],
+    "deny": [
+      "Bash(git push *)",
+      "Bash(git reset --hard *)",
+      "Bash(rm -rf *)",
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "title": "CodeReview",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "summary", "findings"],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["approve", "request_changes"],
+      "description": "blocker か major が1件でもあれば request_changes"
+    },
+    "summary": {
+      "type": "string",
+      "description": "レビュー全体の要約（日本語で3文以内）"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "category", "file", "line", "title", "detail", "suggestion"],
+        "properties": {
+          "id": { "type": "string", "description": "F1, F2, ... の連番" },
+          "severity": { "type": "string", "enum": ["blocker", "major", "minor"] },
+          "category": {
+            "type": "string",
+            "enum": ["spec", "bug", "test", "security", "design", "style"]
+          },
+          "file": { "type": "string" },
+          "line": { "type": ["integer", "null"] },
+          "title": { "type": "string", "description": "1行の要約" },
+          "detail": { "type": "string", "description": "なぜ問題か。再現条件があれば書く" },
+          "suggestion": { "type": "string", "description": "具体的な修正案" }
+        }
+      }
+    }
+  }
+}
