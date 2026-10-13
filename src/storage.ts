@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { TodoList } from "./todo.js";
@@ -46,7 +47,7 @@ export async function loadTodos(path: string): Promise<TodoList> {
 
 export async function saveTodos(path: string, list: TodoList): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
-  const tmp = `${path}.${process.pid}.${Date.now()}.tmp`;
+  const tmp = `${path}.${process.pid}.${randomUUID()}.tmp`;
   const body = JSON.stringify({ version: 1, todos: list.all() }, null, 2) + "\n";
   await writeFile(tmp, body, "utf8");
   await rename(tmp, path);

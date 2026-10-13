@@ -1,7 +1,7 @@
 import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadTodos, saveTodos, StorageError } from "./storage.js";
 import { TodoList } from "./todo.js";
 
@@ -16,6 +16,25 @@ afterEach(async () => {
 });
 
 describe("storage", () => {
+  it("同じ時刻に同じパスへ並行保存しても一時ファイルが衝突しない", async () => {
+    const path = join(dir, "todos.json");
+    const lists = Array.from({ length: 8 }, (_, index) => {
+      const list = new TodoList(() => new Date("2026-01-01T00:00:00Z"));
+      list.add({ title: `todo-${index}` });
+      return list;
+    });
+    const now = vi.spyOn(Date, "now").mockReturnValue(1767225600000);
+    try {
+      const results = await Promise.allSettled(lists.map((list) => saveTodos(path, list)));
+      expect(results.map((result) => result.status)).toEqual(lists.map(() => "fulfilled"));
+      const loaded = await loadTodos(path);
+      expect(lists.map((list) => JSON.parse(JSON.stringify(list.all())))).toContainEqual(loaded.all());
+      expect(await readdir(dir)).toEqual(["todos.json"]);
+    } finally {
+      now.mockRestore();
+    }
+  });
+
   it("保存して読み込むと内容と次のIDが保たれる", async () => {
     const list = new TodoList(() => new Date("2026-01-01T00:00:00Z"));
     list.add({ title: "a", tags: ["x"], due: "2026-02-01" });
