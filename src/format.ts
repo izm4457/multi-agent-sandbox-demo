@@ -3,8 +3,7 @@ import type { Todo } from "./todo.js";
 const MS_PER_DAY = 86_400_000;
 
 function toUtcDay(date: string): number {
-  const [y, m, d] = date.split("-").map(Number);
-  return Date.UTC(y ?? 0, (m ?? 1) - 1, d ?? 1) / MS_PER_DAY;
+  return Date.parse(`${date}T00:00:00.000Z`) / MS_PER_DAY;
 }
 
 function relative(due: string, today: string): string {

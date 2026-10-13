@@ -65,6 +65,18 @@ describe("formatTodo", () => {
     expect(formatTodo(make({ due: "2026-12-31" }), "2027-01-01")).toContain("yesterday)");
     expect(formatTodo(make({ due: "2027-01-03" }), "2026-12-30")).toContain("in 4 days)");
   });
+
+  it("preserves years below 0100 in UTC date calculations", () => {
+    expect(formatTodo(make({ due: "0100-01-01" }), "0099-12-31")).toBe(
+      "[ ] #3 Buy milk  (due: 0100-01-01, tomorrow)",
+    );
+    expect(formatTodo(make({ due: "0099-12-31" }), "0100-01-01")).toBe(
+      "[ ] #3 Buy milk  (due: 0099-12-31, yesterday)",
+    );
+    expect(formatTodo(make({ due: "0000-03-01" }), "0000-02-28")).toBe(
+      "[ ] #3 Buy milk  (due: 0000-03-01, in 2 days)",
+    );
+  });
 });
 
 describe("formatTodoList", () => {
