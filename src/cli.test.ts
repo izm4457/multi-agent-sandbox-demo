@@ -1,8 +1,9 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { runCli, type CliIO } from "./cli.js";
+import { loadTodos } from "./storage.js";
 
 function makeIo(today = "2026-10-12"): {
   io: CliIO;
@@ -55,6 +56,21 @@ describe("runCli", () => {
     expect(list.stdout).toEqual([
       "[ ] #1 Write report  #work  (due: 2026-10-15, in 3 days)\n",
     ]);
+  });
+
+  it("reports the saved todo id when adding after a deletion", async () => {
+    const path = join(dir, "todos.json");
+    expect(await runCli(["add", "First"], path, makeIo().io)).toBe(0);
+    expect(await runCli(["add", "Second"], path, makeIo().io)).toBe(0);
+    expect(await runCli(["rm", "1"], path, makeIo().io)).toBe(0);
+
+    const add = makeIo();
+    expect(await runCli(["add", "Third"], path, add.io)).toBe(0);
+    expect(add.stderr).toEqual([]);
+    const saved = await loadTodos(path);
+    const todo = saved.get(3);
+    expect(todo.title).toBe("Third");
+    expect(add.stdout).toEqual([`Added #${todo.id}\n`]);
   });
 
   it("filters by status, tag, text and due-before", async () => {
@@ -177,6 +193,19 @@ describe("runCli", () => {
     const rmOut = makeIo();
     expect(await runCli(["rm", "0"], path, rmOut.io)).toBe(1);
     expect(rmOut.stderr[0]).toContain("invalid id");
+  });
+
+  it.each(["done", "rm"])("rejects extra positional arguments for %s without changing saved data", async (command) => {
+    const path = join(dir, "todos.json");
+    expect(await runCli(["add", "First"], path, makeIo().io)).toBe(0);
+    expect(await runCli(["add", "Second"], path, makeIo().io)).toBe(0);
+    const before = await readFile(path, "utf8");
+
+    const output = makeIo();
+    expect(await runCli([command, "2", "unexpected"], path, output.io)).toBe(1);
+    expect(output.stderr[0]).toContain("unexpected arguments");
+    expect(output.stdout).toEqual([]);
+    expect(await readFile(path, "utf8")).toBe(before);
   });
 
   it("reports non-existent id for done and rm", async () => {

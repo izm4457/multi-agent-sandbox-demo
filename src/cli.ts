@@ -46,9 +46,9 @@ async function runAdd(args: string[], dataPath: string, io: CliIO): Promise<numb
   }
 
   const list = await loadTodos(dataPath);
-  list.add({ title, tags: values.tag, due: values.due });
+  const todo = list.add({ title, tags: values.tag, due: values.due });
   await saveTodos(dataPath, list);
-  io.stdout(`Added #${list.all().length}\n`);
+  io.stdout(`Added #${todo.id}\n`);
   return 0;
 }
 
@@ -95,8 +95,12 @@ async function runDone(args: string[], dataPath: string): Promise<number> {
     allowPositionals: true,
   });
 
+  if (positionals.length > 1) {
+    throw new Error(`unexpected arguments: ${positionals.slice(1).join(" ")}`);
+  }
+  const id = parseId(positionals[0]);
   const list = await loadTodos(dataPath);
-  list.complete(parseId(positionals[0]));
+  list.complete(id);
   await saveTodos(dataPath, list);
   return 0;
 }
@@ -108,8 +112,12 @@ async function runRm(args: string[], dataPath: string): Promise<number> {
     allowPositionals: true,
   });
 
+  if (positionals.length > 1) {
+    throw new Error(`unexpected arguments: ${positionals.slice(1).join(" ")}`);
+  }
+  const id = parseId(positionals[0]);
   const list = await loadTodos(dataPath);
-  list.remove(parseId(positionals[0]));
+  list.remove(id);
   await saveTodos(dataPath, list);
   return 0;
 }
