@@ -13,7 +13,7 @@ ROUND="$(current_round "$TASK")"
 
 [[ -f "$RUN/review-r$ROUND.json" ]] || die "レビュー結果がありません"
 node "$ROOT/scripts/review-summary.mjs" "$RUN/review-r$ROUND.json" >/dev/null \
-  || die "最新レビュー（r$ROUND）が approve ではありません"
+  || die "最新レビュー（r${ROUND}）が approve ではありません"
 
 cd "$ROOT"
 [[ "$(git branch --show-current)" == "$BASE_BRANCH" ]] || die "$BASE_BRANCH をチェックアウトした状態で実行してください"

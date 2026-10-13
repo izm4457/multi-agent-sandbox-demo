@@ -15,7 +15,7 @@ BRANCH="$(task_branch "$TASK")"
 
 ROUND=$(( $(current_round "$TASK") + 1 ))
 if (( ROUND > MAX_REVIEW_ROUNDS )); then
-  warn "$TASK：レビュー往復が上限（$MAX_REVIEW_ROUNDS）に達しました。人間の判断が必要です"
+  warn "${TASK}：レビュー往復が上限（${MAX_REVIEW_ROUNDS}）に達しました。人間の判断が必要です"
   exit 3
 fi
 echo "$ROUND" > "$RUN/round"

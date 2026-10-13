@@ -23,7 +23,7 @@ else
   git -C "$ROOT" worktree add -q "$WT" -b "$BRANCH" "$BASE_BRANCH"
   # 依存は共有（同じ lockfile 前提）。worktree ごとの npm install を省く
   ln -s "$ROOT/node_modules" "$WT/node_modules"
-  log "worktree 作成：$WT（$BRANCH）"
+  log "worktree 作成：${WT}（${BRANCH}）"
 fi
 
 echo "$BRANCH" > "$RUN/branch"

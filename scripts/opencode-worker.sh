@@ -20,7 +20,7 @@ PROMPT="$(render "$ROOT/templates/worker-prompt.md")"
 args=(run --auto --dir "$WT" --title "$TASK")
 [[ -n "$OPENCODE_MODEL" ]] && args+=(-m "$OPENCODE_MODEL")
 
-log "opencode 実行中：$TASK（ログ：$RUN/opencode.log）"
+log "opencode 実行中：${TASK}（ログ：$RUN/opencode.log）"
 set +e
 ( cd "$WT" && with_timeout opencode "${args[@]}" "$PROMPT" ) </dev/null >"$RUN/opencode.log" 2>&1
 rc=$?
@@ -31,9 +31,9 @@ set -e
 tail -n 60 "$RUN/opencode.log" > "$RUN/worker-report.md"
 
 if "$ROOT/scripts/verify.sh" "$WT" >"$RUN/verify.log" 2>&1; then
-  log "$TASK：$(tail -1 "$RUN/verify.log")"
+  log "${TASK}：$(tail -1 "$RUN/verify.log")"
   exit 0
 else
-  warn "$TASK：$(tail -1 "$RUN/verify.log")（詳細：$RUN/verify.log）"
+  warn "${TASK}：$(tail -1 "$RUN/verify.log")（詳細：$RUN/verify.log）"
   exit 1
 fi

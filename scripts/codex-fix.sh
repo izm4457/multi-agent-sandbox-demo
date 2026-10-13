@@ -11,7 +11,7 @@ WT="$(wt_path "$TASK")"
 RUN="$(run_dir "$TASK")"
 ROUND="$(current_round "$TASK")"
 REVIEW="$RUN/review-r$ROUND.json"
-[[ -f "$REVIEW" ]] || die "レビュー結果がありません：$REVIEW（先に codex-review.sh）"
+[[ -f "$REVIEW" ]] || die "レビュー結果がありません：${REVIEW}（先に codex-review.sh）"
 
 # 修正対象の指摘だけ渡す
 export FINDINGS="$(node -e '
@@ -33,7 +33,7 @@ args=(exec -s workspace-write -C "$WT" --ephemeral
       -c "model_reasoning_effort=\"$CODEX_FIX_EFFORT\"")
 [[ -n "$CODEX_MODEL" ]] && args+=(-m "$CODEX_MODEL")
 
-log "Codex 修正中：$TASK（ラウンド $ROUND の指摘）"
+log "Codex 修正中：${TASK}（ラウンド $ROUND の指摘）"
 # </dev/null：非TTYから起動されたとき Codex が stdin を待ち続けないようにする
 with_timeout codex "${args[@]}" "$PROMPT" </dev/null >"$RUN/codex-fix-r$ROUND.log" 2>&1 \
   || die "Codex 修正が失敗しました（$RUN/codex-fix-r$ROUND.log）"
@@ -41,7 +41,7 @@ with_timeout codex "${args[@]}" "$PROMPT" </dev/null >"$RUN/codex-fix-r$ROUND.lo
 "$ROOT/scripts/commit-task.sh" "$TASK" "fix review round $ROUND (codex)"
 
 if "$ROOT/scripts/verify.sh" "$WT" >"$RUN/verify.log" 2>&1; then
-  log "$TASK：$(tail -1 "$RUN/verify.log")"
+  log "${TASK}：$(tail -1 "$RUN/verify.log")"
 else
-  warn "$TASK：$(tail -1 "$RUN/verify.log")"; exit 1
+  warn "${TASK}：$(tail -1 "$RUN/verify.log")"; exit 1
 fi
