@@ -13,6 +13,7 @@ AI開発チーム（Claude Code / Codex / opencode）の協調を試すための
 - Node.js 22+ / TypeScript 5（ESM, `"type": "module"`）
 - テスト：vitest　lint：eslint（typescript-eslint）　型：`tsc --noEmit`
 - ランタイム依存は追加しない（Node 標準ライブラリのみ）。必要なら理由を報告に書くこと
+- 運用スクリプトの検査に shellcheck を使う（npm run verify の前提。brew install shellcheck）
 
 ## ディレクトリ
 
