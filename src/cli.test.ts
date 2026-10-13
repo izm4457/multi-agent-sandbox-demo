@@ -173,6 +173,48 @@ describe("runCli", () => {
     expect(stderr[0]).toContain("due-before must be YYYY-MM-DD");
   });
 
+  it.each([
+    "2026-00-01",
+    "2026-13-01",
+    "2026-01-00",
+    "2026-01-32",
+    "2026-04-31",
+    "2026-02-29",
+    "2028-02-30",
+    "1900-02-29",
+  ])("rejects invalid calendar date %s without changing saved data", async (date) => {
+    const path = join(dir, "todos.json");
+    expect(await runCli(["add", "Existing"], path, makeIo().io)).toBe(0);
+    const before = await readFile(path, "utf8");
+
+    const add = makeIo();
+    expect(await runCli(["add", "Invalid", "--due", date], path, add.io)).toBe(1);
+    expect(add.stderr).toEqual([`due must be YYYY-MM-DD: ${date}\n`]);
+    expect(add.stdout).toEqual([]);
+    expect(await readFile(path, "utf8")).toBe(before);
+
+    const list = makeIo();
+    expect(await runCli(["list", "--due-before", date], path, list.io)).toBe(1);
+    expect(list.stderr).toEqual([`due-before must be YYYY-MM-DD: ${date}\n`]);
+    expect(list.stdout).toEqual([]);
+  });
+
+  it.each(["2026-02-28", "2026-04-30", "2028-02-29", "2000-02-29"])(
+    "accepts valid calendar date %s for both date options",
+    async (date) => {
+      const path = join(dir, "todos.json");
+      const add = makeIo(date);
+      expect(await runCli(["add", "Valid", "--due", date], path, add.io)).toBe(0);
+      expect(add.stderr).toEqual([]);
+      expect((await loadTodos(path)).get(1).due).toBe(date);
+
+      const list = makeIo(date);
+      expect(await runCli(["list", "--due-before", date], path, list.io)).toBe(0);
+      expect(list.stderr).toEqual([]);
+      expect(list.stdout[0]).toContain("#1 Valid");
+    },
+  );
+
   it("reports missing id for done and rm", async () => {
     const path = join(dir, "todos.json");
     const done = makeIo();

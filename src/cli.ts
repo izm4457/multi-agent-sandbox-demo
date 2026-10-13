@@ -11,6 +11,18 @@ export interface CliIO {
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+function isValidDate(value: string): boolean {
+  if (!DATE_RE.test(value)) {
+    return false;
+  }
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(5, 7));
+  const day = Number(value.slice(8, 10));
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+  return daysInMonth !== undefined && day >= 1 && day <= daysInMonth;
+}
+
 function isValidStatus(value: string): value is "open" | "done" {
   return value === "open" || value === "done";
 }
@@ -41,7 +53,7 @@ async function runAdd(args: string[], dataPath: string, io: CliIO): Promise<numb
   }
   const title = positionals.join(" ");
 
-  if (values.due !== undefined && !DATE_RE.test(values.due)) {
+  if (values.due !== undefined && !isValidDate(values.due)) {
     throw new Error(`due must be YYYY-MM-DD: ${values.due}`);
   }
 
@@ -73,7 +85,7 @@ async function runList(args: string[], dataPath: string, io: CliIO): Promise<num
   }
 
   const dueBefore = values["due-before"];
-  if (dueBefore !== undefined && !DATE_RE.test(dueBefore)) {
+  if (dueBefore !== undefined && !isValidDate(dueBefore)) {
     throw new Error(`due-before must be YYYY-MM-DD: ${dueBefore}`);
   }
 
