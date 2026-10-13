@@ -15,7 +15,7 @@ ROUND="$(current_round "$TASK")"
 node "$ROOT/scripts/review-summary.mjs" "$RUN/review-r$ROUND.json" >/dev/null \
   || die "最新レビュー（r${ROUND}）が approve ではありません"
 
-cd "$ROOT"
+cd "$ROOT" || die "リポジトリ直下に移動できません：${ROOT}"
 [[ "$(git branch --show-current)" == "$BASE_BRANCH" ]] || die "$BASE_BRANCH をチェックアウトした状態で実行してください"
 [[ -z "$(git status --porcelain)" ]] || die "メインの作業ツリーに未コミットの変更があります"
 

@@ -27,7 +27,7 @@ run_verify() {
   fi
 }
 
-cd "$WT"
+cd "$WT" || die "worktree に移動できません：${WT}"
 changed="$(git status --porcelain --untracked-files=all | sed -E 's/^.{3}//' | sed -E 's/.* -> //' | grep -v '^node_modules$' || true)"
 if [[ -z "$changed" ]]; then
   warn "変更がありません（コミットをスキップ）"

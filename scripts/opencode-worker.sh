@@ -13,8 +13,8 @@ WT="$(wt_path "$TASK")"
 RUN="$(run_dir "$TASK")"
 
 export TASK_ID="$TASK" WORKTREE="$WT"
-export TASK_BODY="$(cat "$(task_file "$TASK")")"
-export ALLOWED_FILES="$(task_allowed_files "$TASK" | sed 's/^/- /')"
+TASK_BODY="$(cat "$(task_file "$TASK")")"; export TASK_BODY
+ALLOWED_FILES="$(task_allowed_files "$TASK" | sed 's/^/- /')"; export ALLOWED_FILES
 PROMPT="$(render "$ROOT/templates/worker-prompt.md")"
 
 args=(run --auto --dir "$WT" --title "$TASK")
