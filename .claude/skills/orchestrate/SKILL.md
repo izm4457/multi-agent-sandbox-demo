@@ -29,9 +29,13 @@ argument-hint: "[タスクID ...]（省略時は未着手の全タスク）"
 ## 2. 完了処理（タスクごと）
 1. worker-claude のタスクは `scripts/commit-task.sh <TASK> "<報告の変更概要を1行で>"`
    （opencode は opencode-worker.sh 終了後に同じく commit-task.sh を実行）
-   - 終了コード 3（files_allowed 外の変更）なら、内容を確認して人間に判断を仰ぐ
-2. verify が FAIL のままなら、まず Codex 修正に回さずワーカーに1回だけ差し戻す
-   （同じ worktree で、失敗ログ `.agent-runs/<TASK>/verify.log` の末尾を添えて再依頼）
+   - メッセージに `T-xxx:` を付けなくてよい（付けても重複しない）
+   - commit-task.sh はコミット後（変更なしでも）verify まで実行し、`.agent-runs/<TASK>/verify.log` を書く
+   - 終了コード 0：コミット成功かつ verify PASS
+   - 終了コード 3（files_allowed 外の変更）：内容を確認して人間に判断を仰ぐ（verify は走らない）
+   - 終了コード 4（コミットは成功したが verify FAIL）：2. へ
+2. 終了コード 4 のときは、Codex 修正に回さずワーカーに1回だけ差し戻す
+   （同じ worktree で、`.agent-runs/<TASK>/verify.log` の末尾を添えて再依頼し、再度 commit-task.sh）
 
 ## 3. レビューループ
 ```
