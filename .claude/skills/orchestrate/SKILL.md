@@ -44,6 +44,7 @@ scripts/codex-review.sh <TASK>
   終了コード 2（request_changes）→ scripts/codex-fix.sh <TASK> → もう一度 codex-review.sh
   終了コード 3（往復上限）       → 止めて人間に報告（要約と .agent-runs/<TASK>/ の場所を示す）
 ```
+- `codex-fix.sh` が終了コード 3（files_allowed 外の変更）で止まったら、内容を確認して人間に判断を仰ぐ
 - 指摘が仕様の解釈違い（指示書の曖昧さが原因）なら、修正に回す前に人間に確認する
 - minor のみの approve はそのまま進める（minor は最終報告に一覧で載せる）
 
