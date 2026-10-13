@@ -28,9 +28,9 @@ echo "$ROUND" > "$RUN/round"
 "$ROOT/scripts/verify.sh" "$WT" >"$RUN/verify.log" 2>&1 || true
 
 export TASK_ID="$TASK" ROUND MAX_REVIEW_ROUNDS
-export TASK_BODY="$(cat "$(task_file "$TASK")")"
-export VERIFY_RESULT="$(tail -n 40 "$RUN/verify.log")"
-export PREVIOUS_REVIEW="$( [[ -f "$RUN/review-r$((ROUND-1)).json" ]] && cat "$RUN/review-r$((ROUND-1)).json" || echo '(初回レビュー)')"
+TASK_BODY="$(cat "$(task_file "$TASK")")"; export TASK_BODY
+VERIFY_RESULT="$(tail -n 40 "$RUN/verify.log")"; export VERIFY_RESULT
+PREVIOUS_REVIEW="$( [[ -f "$RUN/review-r$((ROUND-1)).json" ]] && cat "$RUN/review-r$((ROUND-1)).json" || echo '(初回レビュー)' )"; export PREVIOUS_REVIEW
 PROMPT="$(render "$ROOT/templates/review-prompt.md")"
 
 OUT="$RUN/review-r$ROUND.json"
